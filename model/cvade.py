@@ -49,8 +49,6 @@ class CVaDE(nn.Module):
         self.p_c_logits = nn.Parameter(t.ones(num_clusters))
         self.p_z_mu_logvar = nn.Parameter(t.zeros(num_clusters, self.latent_size * 2))
 
-        self.q_z_c = nn.Parameter(t.randn(num_clusters, self.latent_size) * 0.4)
-
         self.free_bits = nn.Parameter(t.FloatTensor([free_bits]), requires_grad=False)
 
     def forward(self, input):
@@ -77,10 +75,8 @@ class CVaDE(nn.Module):
         cat_logits = self.hidden_to_cat(hidden)
         kl_cat = self._kl_cat(cat_logits)
 
-        cat = GumbelSoftmax(cat_logits, 0.1, hard=True)
+        cat = GumbelSoftmax(cat_logits, 0.3, hard=False)
         p_mu_logvar = t.mm(cat, self.p_z_mu_logvar)
-
-        z += t.mm(cat, self.q_z_c)
 
         kl_z = self._kl_gauss(mu, logvar, p_mu_logvar[:, :self.latent_size], p_mu_logvar[:, self.latent_size:])
 
