@@ -17,40 +17,39 @@ class CVaDE(nn.Module):
         self.num_clusters = num_clusters
 
         self.x_to_hidden = nn.Sequential(
-            weight_norm(nn.Linear(784, 900)),
+            weight_norm(nn.Linear(784, 500)),
             nn.SELU(),
-            weight_norm(nn.Linear(900, 900)),
-            nn.SELU(),
-            weight_norm(nn.Linear(900, 500))
+            weight_norm(nn.Linear(500, 2000)),
+            nn.SELU()
         )
 
         self.hidden_to_z = nn.Sequential(
-            weight_norm(nn.Linear(500, 200)),
+            weight_norm(nn.Linear(2000, 100)),
             nn.SELU(),
-            weight_norm(nn.Linear(200, self.latent_size * 2))
+            weight_norm(nn.Linear(100, self.latent_size * 2))
         )
 
         self.hidden_to_cat = nn.Sequential(
-            weight_norm(nn.Linear(500, 300)),
+            weight_norm(nn.Linear(2000, 50)),
             nn.SELU(),
 
-            weight_norm(nn.Linear(300, num_clusters))
+            weight_norm(nn.Linear(50, num_clusters))
         )
 
         self.z_to_x = nn.Sequential(
-            weight_norm(nn.Linear(self.latent_size, 200)),
+            weight_norm(nn.Linear(self.latent_size, 2000)),
             nn.SELU(),
-            weight_norm(nn.Linear(200, 400)),
+            weight_norm(nn.Linear(2000, 500)),
             nn.SELU(),
-            weight_norm(nn.Linear(400, 900)),
+            weight_norm(nn.Linear(500, 500)),
             nn.SELU(),
-            weight_norm(nn.Linear(900, 784))
+            weight_norm(nn.Linear(500, 784))
         )
 
         self.p_c_logits = nn.Parameter(t.ones(num_clusters))
         self.p_z_mu_logvar = nn.Parameter(t.zeros(num_clusters, self.latent_size * 2))
 
-        self.q_z_c = nn.Parameter(t.randn(num_clusters, self.latent_size) * 0.2)
+        self.q_z_c = nn.Parameter(t.randn(num_clusters, self.latent_size) * 0.4)
 
         self.free_bits = nn.Parameter(t.FloatTensor([free_bits]), requires_grad=False)
 
@@ -78,7 +77,7 @@ class CVaDE(nn.Module):
         cat_logits = self.hidden_to_cat(hidden)
         kl_cat = self._kl_cat(cat_logits)
 
-        cat = GumbelSoftmax(cat_logits, 0.3, hard=True)
+        cat = GumbelSoftmax(cat_logits, 0.1, hard=True)
         p_mu_logvar = t.mm(cat, self.p_z_mu_logvar)
 
         z += t.mm(cat, self.q_z_c)

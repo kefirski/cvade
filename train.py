@@ -20,15 +20,15 @@ if __name__ == "__main__":
         os.mkdir('sampling')
 
     parser = argparse.ArgumentParser(description='CDVAE')
-    parser.add_argument('--num-epochs', type=int, default=10, metavar='NI',
+    parser.add_argument('--num-epochs', type=int, default=50, metavar='NI',
                         help='num epochs (default: 10)')
     parser.add_argument('--batch-size', type=int, default=80, metavar='BS',
-                        help='batch size (default: 40)')
+                        help='batch size (default: 80)')
     parser.add_argument('--num-clusters', type=int, default=10, metavar='NC',
                         help='num clusters (default: 10)')
     parser.add_argument('--use-cuda', type=bool, default=False, metavar='CUDA',
                         help='use cuda (default: False)')
-    parser.add_argument('--learning-rate', type=float, default=0.001, metavar='LR',
+    parser.add_argument('--learning-rate', type=float, default=0.0015, metavar='LR',
                         help='learning rate (default: 0.001)')
     parser.add_argument('--save', type=str, default='trained_model', metavar='TS',
                         help='path where save trained model to (default: "trained_model")')
@@ -41,7 +41,7 @@ if __name__ == "__main__":
                              train=True)
     dataloader = t.utils.data.DataLoader(dataset, batch_size=args.batch_size, shuffle=True)
 
-    model = CVaDE(50, num_clusters=args.num_clusters, free_bits=0.5)
+    model = CVaDE(20, num_clusters=args.num_clusters, free_bits=0.5)
     if args.use_cuda:
         model = model.cuda()
 
