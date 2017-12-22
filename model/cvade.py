@@ -108,7 +108,7 @@ class CVaDE(nn.Module):
 
         return nll, kld
 
-    def sample(self):
+    def sample(self, cuda):
 
         size = 25
         params = self.p_z_mu_logvar.repeat(size, 1)
@@ -122,6 +122,8 @@ class CVaDE(nn.Module):
         std = t.exp(0.5 * logvar)
 
         eps = Variable(t.randn(*mu.size()))
+        if cuda:
+            eps = eps.cuda()
         z = eps * std + mu
 
         result = F.sigmoid(self.z_to_x(z))

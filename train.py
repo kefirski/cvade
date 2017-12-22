@@ -68,7 +68,7 @@ if __name__ == "__main__":
                 print('epoch {}, iteration {}, loss {}'.format(epoch, iteration, loss.cpu().data.numpy()[0]))
                 print(F.softmax(model.p_c_logits, dim=0).cpu().data.numpy())
 
-                sampling = model.sample()
+                sampling = model.sample(args.use_cuda)
                 vutils.save_image(sampling, 'sampling/vae_{}.png'.format(epoch * len(dataloader) + iteration))
 
     samplings = [f for f in listdir('sampling')]
